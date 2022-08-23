@@ -1,8 +1,6 @@
+import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import { request } from "http";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../backend/utils/prisma";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
@@ -11,13 +9,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ statusCode: 405, message: "Method Not Allowed" });
   }
 
-  const userData = JSON.parse(req.body);
+  const userData: Prisma.UserCreateInput = JSON.parse(req.body);
 
-  const savedUser = await prisma.user.create({
-    data: userData,
-  });
-
-  return res.json({ message: "User Created", data: savedUser });
+  try {
+    const savedUser = await prisma.user.create({
+      data: {
+        name: !userData.name ? null : userData.name,
+        email: !userData.email ? null : userData.email,
+      },
+    });
+    console.log("createUser API hit successfully");
+    return res.json({ message: "User Created", data: savedUser });
+  } catch (error) {
+    console.log("createUser API hit but got an error", error);
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 export default handler;
