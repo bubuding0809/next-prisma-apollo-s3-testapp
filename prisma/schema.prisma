@@ -19,7 +19,7 @@ model Post {
   title     String   @db.VarChar(255)
   content   String?
   published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  Int
 
   @@index(authorId)
@@ -28,8 +28,20 @@ model Post {
 model Profile {
   id     Int     @id @default(autoincrement())
   bio    String?
-  user   User    @relation(fields: [userId], references: [id])
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int     @unique
+
+  @@index(userId)
+}
+
+model Image {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  description String?
+  url         String   @unique @db.VarChar(255)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
 
   @@index(userId)
 }
@@ -39,5 +51,6 @@ model User {
   email   String   @unique
   name    String?
   posts   Post[]
+  images  Image[]
   profile Profile?
 }

@@ -18,6 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     await prisma.user.create({
       data: { email, name: email.split("@")[0] },
     });
+
     return res.status(200).json({
       message: `User with email: ${email} has been created successfully!`,
     });

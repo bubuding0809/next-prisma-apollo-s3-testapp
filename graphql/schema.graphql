@@ -7,10 +7,23 @@ type Edge {
   node: User
 }
 
+type Image {
+  description: String
+  id: Int
+  url: String
+  user: User
+  userId: Int
+}
+
 type Mutation {
+  createImagebyEmail(description: String, email: String!, url: String!): Image
+  createImagebyId(description: String, url: String!, userId: Int!): Image
   createPost(authorId: Int, content: String, published: Boolean, title: String): Post!
   createProfile(bio: String, email: String): Profile!
   createUser(bio: String, email: String, name: String): User!
+  deleteImage(id: Int!): Image
+  deleteUser(id: Int!): User!
+  updateImage(description: String!, id: Int!, url: String!): Image
 }
 
 type PageInfo {
@@ -35,10 +48,14 @@ type Profile {
 }
 
 type Query {
+  allImages: [Image]!
+  image(id: Int): Image
   posts: [Post]!
   profile(id: Int): Profile
   profiles: [Profile]!
   user(id: Int): User
+  userImagesByEmail(email: String!): [Image]!
+  userImagesById(userId: Int!): [Image]!
   users(after: Int, first: Int): Response
 }
 

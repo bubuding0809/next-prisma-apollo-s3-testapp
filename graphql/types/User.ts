@@ -1,4 +1,11 @@
-import { enumType, extendType, intArg, objectType, stringArg } from "nexus";
+import {
+  enumType,
+  extendType,
+  intArg,
+  nonNull,
+  objectType,
+  stringArg,
+} from "nexus";
 import { Profile } from "./Profile";
 
 export const User = objectType({
@@ -83,18 +90,6 @@ export const UserQuery = extendType({
   },
 });
 
-// export const UsersQuery = extendType({
-//   type: "Query",
-//   definition(t) {
-//     t.nonNull.list.field("users", {
-//       type: User,
-//       async resolve(_parent, _args, ctx) {
-//         return await ctx.prisma.user.findMany();
-//       },
-//     });
-//   },
-// });
-
 export const UsersQuery = extendType({
   type: "Query",
   definition(t) {
@@ -141,7 +136,6 @@ export const UsersQuery = extendType({
             },
           });
 
-          console.log(secondQueryResults);
           return {
             pageInfo: {
               endCursor: myCursor,
@@ -186,6 +180,25 @@ export const UsersMutation = extendType({
                 bio: args.bio,
               },
             },
+          },
+        });
+      },
+    });
+  },
+});
+
+export const deleteUsersMutation = extendType({
+  type: "Mutation",
+  definition(t) {
+    t.nonNull.field("deleteUser", {
+      type: User,
+      args: {
+        id: nonNull(intArg()),
+      },
+      async resolve(_parent, args, ctx) {
+        return await ctx.prisma.user.delete({
+          where: {
+            id: args.id,
           },
         });
       },
