@@ -9,14 +9,13 @@ const Header = () => {
     <header>
       <div className="flex justify-between items-center px-2 py-2 bg-slate-100/50 shadow-md">
         <div>
-          <Link href="/">Home</Link>
+          <Link href="/">Home </Link>
           <Link href="/about">
-            <a>| About</a>
+            <a>| Images </a>
           </Link>
           <Link href="/users">
-            <a>| Users List</a>
+            <a>| SSG </a>
           </Link>
-          <a href="/api/defaultUsers">| Users API</a>
         </div>
         <nav className="flex items-center justify-center mr-2">
           {user ? (

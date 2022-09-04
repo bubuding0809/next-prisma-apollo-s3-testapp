@@ -1,7 +1,6 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { gql, useQuery, useMutation } from "@apollo/client";
 import apolloClient from "../backend/utils/apollo";
-import { Prisma, User, Post, Profile, Image } from "@prisma/client";
 import { useUser } from "@auth0/nextjs-auth0";
 import Head from "next/head";
 
