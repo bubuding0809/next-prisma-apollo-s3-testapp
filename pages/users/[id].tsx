@@ -1,15 +1,13 @@
-import { GetStaticProps, GetStaticPaths } from "next";
-import { sampleUserData } from "../../utils/sample-data";
-import ListDetail from "../../components/ListDetail";
-import { User } from "../../interfaces";
+import { GetServerSideProps } from "next";
+import { User, Profile } from "@prisma/client";
 import Head from "next/head";
 
 type Props = {
-  item?: User;
+  user?: User & { profile: Profile };
   errors?: string;
 };
 
-const StaticPropsDetail = ({ item, errors }: Props) => {
+const StaticPropsDetail = ({ user, errors }: Props) => {
   if (errors) {
     return (
       <>
@@ -31,39 +29,33 @@ const StaticPropsDetail = ({ item, errors }: Props) => {
   return (
     <>
       <Head>
-        <title>{item.name}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
-      {`${item ? item.name : "User Detail"} | Next.js + TypeScript Example`}
-      {item && <ListDetail item={item} />}
+      <div>
+        <h1>id: {user.id}</h1>
+        <h1>{user.name}</h1>
+        <p>Email: {user.email}</p>
+        {user.profile && <p>{user.profile}</p>}
+      </div>
     </>
   );
 };
 
 export default StaticPropsDetail;
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  // Get the paths we want to pre-render based on users
-  const paths = sampleUserData.map(user => ({
-    params: { id: user.id.toString() },
-  }));
-
-  // We'll pre-render only these paths at build time.
-  // { fallback: false } means other routes should 404.
-  return { paths, fallback: false };
-};
-
-// This function gets called at build time on server-side.
-// It won't be called on client-side, so you can even do
-// direct database queries.
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ctx => {
   try {
-    const id = params?.id;
-    const item = sampleUserData.find(data => data.id === Number(id));
-    // By returning { props: item }, the StaticPropsDetail component
-    // will receive `item` as a prop at build time
-    return { props: { item } };
+    const id = ctx.params.id;
+    if (typeof id !== "string") {
+      throw new Error("id is not a string");
+    }
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(id) },
+      include: { profile: true },
+    });
+    if (!user) throw new Error("Cannot find user");
+    return { props: { user } };
   } catch (err: any) {
     return { props: { errors: err.message } };
   }

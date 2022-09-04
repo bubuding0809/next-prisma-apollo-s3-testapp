@@ -3,6 +3,7 @@ import { gql, useQuery, useMutation } from "@apollo/client";
 import apolloClient from "../backend/utils/apollo";
 import { useUser } from "@auth0/nextjs-auth0";
 import Head from "next/head";
+import { GetServerSideProps } from "next";
 
 const allUsersQuery = gql`
   query Users($first: Int, $after: Int) {
@@ -55,19 +56,7 @@ const deleteUserMutation = gql`
   }
 `;
 
-export async function getServerSideProps({ req, res }) {
-  // const session = getSession(req, res);
-
-  // if (!session) {
-  //   return {
-  //     redirect: {
-  //       permanent: false,
-  //       destination: "/api/auth/login",
-  //     },
-  //     props: {},
-  //   };
-  // }
-
+export const getServerSideProps: GetServerSideProps = async () => {
   const { data } = await apolloClient.query({
     query: allUsersQuery,
     variables: { first: 10, after: null },
@@ -78,7 +67,7 @@ export async function getServerSideProps({ req, res }) {
       users: data.users,
     },
   };
-}
+};
 
 const IndexPage = ({ users }) => {
   const { user } = useUser();
